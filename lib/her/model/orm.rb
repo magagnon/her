@@ -111,12 +111,19 @@ module Her
 
         self.class.wrap_in_hooks(resource, *hooks) do |resource, klass|
           klass.request(params.merge(:_method => method, :_path => "#{request_path}")) do |parsed_data|
-            self.data = parsed_data[:data]
             self.metadata = parsed_data[:metadata]
             self.errors = parsed_data[:errors]
+            if self.errors.empty?
+              self.data = parsed_data[:data]
+            end
           end
         end
-        self
+
+        if self.errors.empty?
+          self
+        else
+          false
+        end
       end # }}}
 
       # Destroy a resource
